@@ -16,6 +16,8 @@ const path = require('path');
 const User = require('./models/User');
 
 const app = express();
+app.set('trust proxy', 1); // ← ADDED for Render
+
 const server = http.createServer(app);
 const io = new Server(server);
 
@@ -45,7 +47,12 @@ const sessionMiddleware = session({
   resave: false,
   saveUninitialized: false,
   store: MongoStore.create({ mongoUrl: process.env.MONGODB_URI }),
-  cookie: { maxAge: 7 * 24 * 60 * 60 * 1000, secure: process.env.NODE_ENV === 'production', httpOnly: true }
+  cookie: { 
+    maxAge: 7 * 24 * 60 * 60 * 1000, 
+    secure: process.env.NODE_ENV === 'production', 
+    httpOnly: true,
+    sameSite: 'lax' // ← ADDED
+  }
 });
 app.use(sessionMiddleware);
 
